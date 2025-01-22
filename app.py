@@ -309,10 +309,8 @@ import pandas as pd
 from docx import Document
 import os
 from io import BytesIO
-import pythoncom
 import zipfile
 import shutil
-import win32com.client
 import time
 import streamlit
 import pandas
