@@ -4,5 +4,5 @@ python-docx
 docx2pdf
 openpyxl
 xhtml2pdf
-zipfile
+zipfile36
 
