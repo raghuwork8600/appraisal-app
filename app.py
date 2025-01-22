@@ -3,58 +3,19 @@ import pandas as pd
 from docx import Document
 import os
 from io import BytesIO
-
+import pythoncom
 import zipfile
 import shutil
-
+import win32com.client
 import time
 import sys
+from xhtml2pdf import pisa
+
 
 st.title(":blue[Appraisal Letter] :orange[Generator]")
 
-# Function to convert DOCX to PDF using win32com
+# Function to convert DOCX to PDF using xhtml2pdf (cross-platform)
 def convert_docx_to_pdf(docx_file, pdf_path):
-    pythoncom.CoInitialize()
-    word = None
-    doc = None
-    try:
-        word = win32com.client.Dispatch("Word.Application")
-        word.Visible = False
-        doc = word.Documents.Open(docx_file)
-        doc.SaveAs(pdf_path, FileFormat=17) # 17 is for PDF
-    except Exception as e:
-        print(f"Error converting {docx_file} to PDF: {e}")
-    finally:
-        if doc:
-            doc.Close(False)
-        if word:
-            word.Quit()
-        pythoncom.CoUninitialize()
-        
-        
-def convert_docx_to_pdf(docx_file, pdf_path):
-  
-    if sys.platform == 'win32':
-        import pythoncom
-        import win32com.client
-        pythoncom.CoInitialize()
-        word = None
-        doc = None
-        try:
-          word = win32com.client.Dispatch("Word.Application")
-          word.Visible = False
-          doc = word.Documents.Open(docx_file)
-          doc.SaveAs(pdf_path, FileFormat=17) # 17 is for PDF
-        except Exception as e:
-            print(f"Error converting {docx_file} to PDF using win32com: {e}")
-        finally:
-            if doc:
-                doc.Close(False)
-            if word:
-                word.Quit()
-            pythoncom.CoUninitialize()
-    
-    else:
        try:
             # Convert docx to html (using libreoffice or equivalent on linux)
           html_path = docx_file.replace(".docx", ".html")
@@ -63,7 +24,6 @@ def convert_docx_to_pdf(docx_file, pdf_path):
           subprocess.run(cmd, check = True, capture_output=True)
             
           # Convert HTML to PDF (using xhtml2pdf)
-          from xhtml2pdf import pisa
 
           with open(html_path, "r", encoding="utf-8") as html_file:
             html_content = html_file.read()
@@ -180,7 +140,7 @@ if uploaded_file and not st.session_state.doc_paths:
     os.makedirs(temp_pdf_dir, exist_ok=True)
 
     doc_paths = []
-    pdf_paths = []
+    pdf_paths = [] # initialize the pdf_paths list at the start
     start_time = time.time()
     print(f"Start Time: {start_time}")
 
@@ -237,7 +197,7 @@ if uploaded_file and not st.session_state.doc_paths:
             doc_start_time = time.time()
             doc_path = os.path.join(temp_dir, f"{row['Name of Employee']}_Appraisal_letter.docx")
             doc.save(doc_path)
-            time.sleep(0.1)  # Small delay after saving the file
+            time.sleep(0.1)
             doc_paths.append(doc_path)
             doc_end_time = time.time()
             print(f"Time taken to save word doc for {row['Name of Employee']}: {doc_end_time - doc_start_time}")
@@ -267,10 +227,9 @@ if uploaded_file and not st.session_state.doc_paths:
                    time.sleep(0.1) # Small delay before retry
             else:
                 print(f"Failed to convert {doc_path} after multiple retries")
-            
+                
             if converted:
-                pdf_paths.append(pdf_path)
-        
+                 pdf_paths.append(pdf_path)
         pdf_conversion_end_time = time.time()
         print(f"Total time taken for PDF Conversion: {pdf_conversion_end_time - pdf_conversion_start_time}")
 
