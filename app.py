@@ -12,7 +12,7 @@ import sys
 from xhtml2pdf import pisa
 
 
-st.title(":blue[Appraisal Letter] :orange[Generator]")
+st.title(":green[Appraisal Letter] :orange[Generator]")
 
 # Function to convert DOCX to PDF using xhtml2pdf (cross-platform)
 def convert_docx_to_pdf(docx_file, pdf_path):
